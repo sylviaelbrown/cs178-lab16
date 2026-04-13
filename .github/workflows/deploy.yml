@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
@@ -22,12 +22,13 @@ jobs:
           script: |
             cd ~/cs178-lab16
             git pull origin main
-            pip install -r requirements.txt --quiet
+            pip3 install -r requirements.txt --quiet
 
-            # Stop any existing instance of the app on port 8888
-            pkill -f "python app.py" || true
+            # Stop old app process without killing this deploy script
+            pkill -f '[p]ython3 app.py' || true
+            pkill -f '[p]ython app.py' || true
 
-            # Start the app in the background, logging to app.log
-            nohup python app.py > app.log 2>&1 &
+            # Start app
+            nohup python3 app.py > app.log 2>&1 &
 
             echo "Lab 16 deployed and running on port 8888"
