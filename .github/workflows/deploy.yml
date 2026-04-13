@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Deploy to EC2 via SSH
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -22,12 +22,12 @@ jobs:
           script: |
             cd ~/cs178-lab16
             git pull origin main
-            pip install -r requirements.txt --quiet
+            pip3 install -r requirements.txt --quiet
 
-            # Stop any existing instance of the app on port 8888
-            pkill -f "python app.py" || true
+            # Stop anything already running on port 8888
+            lsof -ti:8888 | xargs -r kill -9 || true
 
-            # Start the app in the background, logging to app.log
-            nohup python app.py > app.log 2>&1 &
+            # Start app in background
+            nohup python3 app.py > app.log 2>&1 &
 
             echo "Lab 16 deployed and running on port 8888"
